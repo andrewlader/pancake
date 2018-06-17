@@ -39,10 +39,12 @@ func main() {
 	token := os.Getenv(githubTokenEnvName)
 
 	log.Print("Mixing batter...")
-	releaseNotes, err := repo.GetChangelog(token, *orgFlag, *repoFlag)
+	releaseNotes, numberOfReleaseNotes, err := repo.GetChangelog(token, *orgFlag, *repoFlag)
 	if err != nil {
 		log.Fatalf("Error! %v", err)
 	}
+
+	log.Printf("Making %d pancakes...", numberOfReleaseNotes)
 
 	log.Print("On the griddle...")
 	file, err := os.Create("CHANGELOG.md")
