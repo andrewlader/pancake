@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/andrewlader/pancake/repo"
 )
@@ -38,23 +39,25 @@ func main() {
 
 	token := os.Getenv(githubTokenEnvName)
 
-	log.Print("Mixing batter...")
+	fmt.Print("Mixing batter...\n")
+	startTime := time.Now()
 	releaseNotes, numberOfReleaseNotes, err := repo.GetChangelog(token, *orgFlag, *repoFlag)
 	if err != nil {
 		log.Fatalf("Error! %v", err)
 	}
+	totalTime := time.Now().Sub(startTime)
 
-	log.Printf("Making %d pancakes...", numberOfReleaseNotes)
+	fmt.Printf("Making %d pancakes...\n", numberOfReleaseNotes)
 
-	log.Print("On the griddle...")
+	fmt.Print("On the griddle...\n")
 	file, err := os.Create("CHANGELOG.md")
 	if err != nil {
 		log.Fatalf("Cannot create file: %v", err)
 	}
 	defer file.Close()
 
-	log.Print("Ready to serve...")
+	fmt.Print("Ready to serve...\n")
 	fmt.Fprintf(file, releaseNotes)
 
-	log.Print("All done!")
+	fmt.Printf("Completed processing in %f seconds.\nAll done!\n", totalTime.Seconds())
 }
