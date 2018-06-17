@@ -12,7 +12,7 @@ import (
 func GetChangelog(token string, organization string, repo string) (string, error) {
 	releases, err := getReleases(token, organization, repo)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	releaseNotes := make([]string, 0)
@@ -53,6 +53,10 @@ func getReleases(token string, organization string, repo string) ([]*release, er
 
 	releaseNotes := make([]*release, 0)
 	json.NewDecoder(response.Body).Decode(&releaseNotes)
+
+	if len(releaseNotes) < 1 {
+		return nil, fmt.Errorf("No release notes found...")
+	}
 
 	return releaseNotes, nil
 }
