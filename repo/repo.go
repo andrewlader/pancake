@@ -12,31 +12,15 @@ import (
 
 // GetChangelog returns a markdown representation of the release notes for the provided repo
 func GetChangelog(token string, organization string, repo string) (string, int, error) {
-	releases, err := getReleases(token, organization, repo)
+	releases, err := getReleasesFromGithub(token, organization, repo)
 	if err != nil {
 		return "", 0, err
 	}
 
-	waiter := &sync.WaitGroup{}
-	for _, release := range releases {
-		// have each release generate their release notes in markdown concurrently
-		go release.generateMarkdown(waiter, organization, repo)
-	}
-
-	numberOfReleaseNotes := len(releases)
-	releaseNotes := initializeReleaseNotes(repo, numberOfReleaseNotes)
-
-	waiter.Wait()
-	for _, release := range releases {
-		releaseNotes = append(releaseNotes, release.markdown)
-	}
-
-	changeLog := strings.Join(releaseNotes, "\n")
-
-	return changeLog, numberOfReleaseNotes, nil
+	return processReleaseNotes(releases, organization, repo)
 }
 
-func getReleases(token string, organization string, repo string) ([]*release, error) {
+func getReleasesFromGithub(token string, organization string, repo string) ([]*release, error) {
 	const apiFormat = "https://api.github.com/repos/%s/%s/releases"
 	const headerAuth = "Authorization"
 	const headerAuthFormat = "token %s"
@@ -66,6 +50,26 @@ func getReleases(token string, organization string, repo string) ([]*release, er
 	}
 
 	return releaseNotes, nil
+}
+
+func processReleaseNotes(releases []*release, organization string, repo string) (string, int, error) {
+	waiter := &sync.WaitGroup{}
+	for _, release := range releases {
+		// have each release generate their release notes in markdown concurrently
+		go release.generateMarkdown(waiter, organization, repo)
+	}
+
+	numberOfReleaseNotes := len(releases)
+	releaseNotes := initializeReleaseNotes(repo, numberOfReleaseNotes)
+
+	waiter.Wait()
+	for _, release := range releases {
+		releaseNotes = append(releaseNotes, release.markdown)
+	}
+
+	changeLog := strings.Join(releaseNotes, "\n")
+
+	return changeLog, numberOfReleaseNotes, nil
 }
 
 func initializeReleaseNotes(repo string, numberOfReleaseNotes int) []string {
