@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-const stringGithubPullRequestReplacer = "[[GH-%s]](https://github.com/%s/%s/pull/%s)"
-
 type release struct {
 	TagName string `json:"tag_name"`
 	Name    string `json:"name"`
@@ -24,12 +22,14 @@ type release struct {
 }
 
 func (release *release) generateMarkdown(waiter *sync.WaitGroup, organization string, repo string) {
+	const formatSimpleDate = "2.Jan.2006"
+	const formatSimpleDateWithDay = "Mon 2.Jan.2006"
 	var output string
 
 	waiter.Add(1)
 	defer waiter.Done()
 
-	simpleDateString := release.PublishedAt.Format("2.Jan.2006")
+	simpleDateString := release.PublishedAt.Format(formatSimpleDate)
 	hasTagOrDate := (strings.Contains(release.Name, release.TagName)) || (strings.Contains(release.Name, simpleDateString))
 
 	release.replaceSpecialGithubPullRequests(organization, repo)
@@ -38,13 +38,13 @@ func (release *release) generateMarkdown(waiter *sync.WaitGroup, organization st
 	if hasTagOrDate {
 		output = fmt.Sprintf("---\n### %s\n##### Released on (_%s_) by _%s_\n%s",
 			release.TagName,
-			release.PublishedAt.Format("Mon 2.Jan.2006"),
+			release.PublishedAt.Format(formatSimpleDateWithDay),
 			release.Author.Login,
 			release.Body)
 	} else {
 		output = fmt.Sprintf("---\n### %s\n###### Released on (_%s_) by _%s_\n#### %s\n%s",
 			release.TagName,
-			release.PublishedAt.Format("Mon 2.Jan.2006"),
+			release.PublishedAt.Format(formatSimpleDateWithDay),
 			release.Author.Login,
 			release.Name,
 			release.Body)
