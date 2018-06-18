@@ -1,6 +1,8 @@
 # pancake
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/andrewlader/pancake)](https://goreportcard.com/report/github.com/andrewlader/pancake)
+[![Build Status](https://travis-ci.org/andrewlader/pancake.svg?branch=master)](https://travis-ci.org/andrewlader/pancake)
+[![codecov](https://codecov.io/gh/andrewlader/pancake/branch/master/graph/badge.svg)](https://codecov.io/gh/andrewlader/pancake)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/AndrewLader/pancake/blob/master/LICENSE)
 
 ```
