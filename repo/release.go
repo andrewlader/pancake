@@ -33,8 +33,7 @@ func (release *release) generateMarkdown(waiter *sync.WaitGroup, organization st
 	hasTagOrDate := (strings.Contains(release.Name, release.TagName)) || (strings.Contains(release.Name, simpleDateString))
 
 	release.replaceSpecialGithubPullRequests(organization, repo)
-	release.replaceRegularGithubPullRequests(organization, repo)
-
+	
 	if hasTagOrDate {
 		output = fmt.Sprintf("---\n### %s\n##### Released on (_%s_) by _%s_\n%s",
 			release.TagName,
@@ -56,11 +55,5 @@ func (release *release) generateMarkdown(waiter *sync.WaitGroup, organization st
 func (release *release) replaceSpecialGithubPullRequests(organization string, repo string) {
 	regex := regexp.MustCompile(`(\[GH\-)([0-9]+)\]`)
 	substitution := fmt.Sprintf(`[[GH-$2]](https://github.com/%s/%s/pull/$2)`, organization, repo)
-	release.Body = regex.ReplaceAllString(release.Body, substitution)
-}
-
-func (release *release) replaceRegularGithubPullRequests(organization string, repo string) {
-	regex := regexp.MustCompile(`([^-])#([0-9]+)`)
-	substitution := fmt.Sprintf(`$1[[GH-$2]](https://github.com/%s/%s/pull/$2)`, organization, repo)
 	release.Body = regex.ReplaceAllString(release.Body, substitution)
 }
