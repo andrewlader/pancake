@@ -13,3 +13,5 @@
 
 # Ignore JetBrains .idea folder
 .idea/*
+
+.DS_Store
